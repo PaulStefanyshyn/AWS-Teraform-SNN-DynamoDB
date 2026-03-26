@@ -1,0 +1,26 @@
+# Terraform
+.terraform/
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+.terraform.lock.hcl
+
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Lambda package
+modules/lambda/app.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional: log files
+*.log

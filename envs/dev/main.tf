@@ -32,6 +32,7 @@ module "backend" {
   dynamodb_table_arn  = module.database.table_arn
   dynamodb_table_name = module.database.table_name
   sns_topic_arn       = aws_sns_topic.alerts.arn
+  s3_bucket_name      = aws_s3_bucket.alerts_audio.bucket
 }
 
 # API Gateway
@@ -44,4 +45,17 @@ module "api" {
 
 output "api_url" {
   value = module.api.api_endpoint
+}
+
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+resource "aws_s3_bucket" "alerts_audio" {
+  bucket        = "${local.prefix}-alerts-audio-${random_id.suffix.hex}"
+  force_destroy = true
+}
+
+output "s3_bucket_name" {
+  value = aws_s3_bucket.alerts_audio.bucket
 }

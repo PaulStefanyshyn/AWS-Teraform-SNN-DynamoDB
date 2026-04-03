@@ -3,6 +3,7 @@ variable "source_file" { type = string }
 variable "dynamodb_table_arn" { type = string }
 variable "dynamodb_table_name" { type = string }
 variable "sns_topic_arn" { type = string }
+variable "s3_bucket_name" { type = string }
 
 # ZIP
 data "archive_file" "lambda_zip" {
@@ -62,6 +63,7 @@ resource "aws_lambda_function" "api_handler" {
     variables = {
       TABLE_NAME    = var.dynamodb_table_name
       SNS_TOPIC_ARN = var.sns_topic_arn
+      S3_BUCKET     = var.s3_bucket_name
     }
   }
 }
@@ -86,6 +88,32 @@ resource "aws_iam_role_policy" "lambda_kms" {
         Effect   = "Allow"
         Action   = "kms:Decrypt"
         Resource = "arn:aws:kms:eu-central-1:836822603043:key/38434272-ff01-4228-b750-fe890d6d1c2a"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_polly_s3" {
+  name = "${var.function_name}_polly_s3"
+  role = aws_iam_role.lambda_exec.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "polly:SynthesizeSpeech"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject"
+        ]
+        Resource = "arn:aws:s3:::${var.s3_bucket_name}/*"
       }
     ]
   })

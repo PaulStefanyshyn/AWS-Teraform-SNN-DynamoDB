@@ -18,6 +18,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
   integration_uri        = var.lambda_invoke_arn
+  payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "any_route" {
@@ -43,4 +44,16 @@ resource "aws_apigatewayv2_route" "root_get" {
   api_id    = aws_apigatewayv2_api.http_api.id
   route_key = "GET /"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "audio_route" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /alerts/{id}/audio"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_route" "ai_route" {
+ api_id = aws_apigatewayv2_api.http_api.id
+ route_key = "POST /notes/{id}/analyze"
+ target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
